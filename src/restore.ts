@@ -8,6 +8,8 @@ async function run(): Promise<void> {
     try {
         if (!utils.isCacheFeatureAvailable()) {
             utils.setCacheHitOutput(false);
+            utils.setExactCacheHitOutput(false);
+            utils.setFuzzyCacheHitOutput(false);
             return;
         }
 
@@ -50,7 +52,9 @@ async function run(): Promise<void> {
         utils.setCacheState(cacheKey);
 
         const isExactKeyMatch = utils.isExactKeyMatch(primaryKey, cacheKey);
-        utils.setCacheHitOutput(isExactKeyMatch);
+        utils.setCacheHitOutput(true);
+        utils.setExactCacheHitOutput(isExactKeyMatch);
+        utils.setFuzzyCacheHitOutput(!isExactKeyMatch);
         core.info(`Cache restored from key: ${cacheKey}`);
     } catch (error: unknown) {
         core.setFailed((error as Error).message);
