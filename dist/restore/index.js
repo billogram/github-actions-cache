@@ -4935,6 +4935,8 @@ var Inputs;
 var Outputs;
 (function (Outputs) {
     Outputs["CacheHit"] = "cache-hit";
+    Outputs["ExactCacheHit"] = "exact-cache-hit";
+    Outputs["FuzzyCacheHit"] = "fuzzy-cache-hit";
 })(Outputs = exports.Outputs || (exports.Outputs = {}));
 var State;
 (function (State) {
@@ -38382,7 +38384,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isCacheFeatureAvailable = exports.getInputAsInt = exports.getInputAsArray = exports.isValidEvent = exports.logWarning = exports.getCacheState = exports.setOutputAndState = exports.setCacheHitOutput = exports.setCacheState = exports.isExactKeyMatch = exports.isGhes = void 0;
+exports.isCacheFeatureAvailable = exports.getInputAsInt = exports.getInputAsArray = exports.isValidEvent = exports.logWarning = exports.getCacheState = exports.setOutputAndState = exports.setFuzzyCacheHitOutput = exports.setExactCacheHitOutput = exports.setCacheHitOutput = exports.setCacheState = exports.isExactKeyMatch = exports.isGhes = void 0;
 const cache = __importStar(__webpack_require__(692));
 const core = __importStar(__webpack_require__(470));
 const constants_1 = __webpack_require__(196);
@@ -38406,6 +38408,14 @@ function setCacheHitOutput(isCacheHit) {
     core.setOutput(constants_1.Outputs.CacheHit, isCacheHit.toString());
 }
 exports.setCacheHitOutput = setCacheHitOutput;
+function setExactCacheHitOutput(isCacheHit) {
+    core.setOutput(constants_1.Outputs.ExactCacheHit, isCacheHit.toString());
+}
+exports.setExactCacheHitOutput = setExactCacheHitOutput;
+function setFuzzyCacheHitOutput(isCacheHit) {
+    core.setOutput(constants_1.Outputs.FuzzyCacheHit, isCacheHit.toString());
+}
+exports.setFuzzyCacheHitOutput = setFuzzyCacheHitOutput;
 function setOutputAndState(key, cacheKey) {
     setCacheHitOutput(isExactKeyMatch(key, cacheKey));
     // Store the matched cache key if it exists
@@ -48956,6 +48966,8 @@ function run() {
         try {
             if (!utils.isCacheFeatureAvailable()) {
                 utils.setCacheHitOutput(false);
+                utils.setExactCacheHitOutput(false);
+                utils.setFuzzyCacheHitOutput(false);
                 return;
             }
             // Validate inputs, this can cause task failure
@@ -48980,7 +48992,9 @@ function run() {
             // Store the matched cache key
             utils.setCacheState(cacheKey);
             const isExactKeyMatch = utils.isExactKeyMatch(primaryKey, cacheKey);
-            utils.setCacheHitOutput(isExactKeyMatch);
+            utils.setCacheHitOutput(true);
+            utils.setExactCacheHitOutput(isExactKeyMatch);
+            utils.setFuzzyCacheHitOutput(!isExactKeyMatch);
             core.info(`Cache restored from key: ${cacheKey}`);
         }
         catch (error) {

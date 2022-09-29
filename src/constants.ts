@@ -6,7 +6,9 @@ export enum Inputs {
 }
 
 export enum Outputs {
-    CacheHit = "cache-hit"
+    CacheHit = "cache-hit",
+    ExactCacheHit = "exact-cache-hit",
+    FuzzyCacheHit = "fuzzy-cache-hit"
 }
 
 export enum State {
